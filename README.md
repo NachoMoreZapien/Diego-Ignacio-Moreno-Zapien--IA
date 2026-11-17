@@ -19,3 +19,5 @@
 
 - [Ejercicios de lógica](ejecicios_logica/README.md)
 - [Análisis de dataset en Excel](dataset_excel/README.md)
+- [Perceptrón modificado](percep_modificado/README.md)
+- [Reporte de Dino: análisis exploratorio de datos](reporte_dino_crash_eda/README.md)
