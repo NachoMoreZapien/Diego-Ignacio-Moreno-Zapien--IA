@@ -1,0 +1,28 @@
+si distancia <= 141.5:
+    si distancia <= 129.0:
+        si rapidez_bala <= 7.5:
+            si distancia <= 78.5:
+                si distancia <= 72.0:
+                    -> clase 1  (p=0.99, n=13)
+                si no (distancia > 72.0):
+                    -> clase 1  (p=0.93, n=8)
+            si no (distancia > 78.5):
+                -> clase 0  (p=1.00, n=72)
+        si no (rapidez_bala > 7.5):
+            si distancia <= 105.5:
+                si distancia <= 91.0:
+                    -> clase 1  (p=1.00, n=13)
+                si no (distancia > 91.0):
+                    -> clase 1  (p=0.98, n=17)
+            si no (distancia > 105.5):
+                si rapidez_bala <= 9.5:
+                    -> clase 0  (p=1.00, n=20)
+                si no (rapidez_bala > 9.5):
+                    -> clase 1  (p=0.97, n=25)
+    si no (distancia > 129.0):
+        si rapidez_bala <= 10.5:
+            -> clase 0  (p=1.00, n=42)
+        si no (rapidez_bala > 10.5):
+            -> clase 1  (p=0.95, n=6)
+si no (distancia > 141.5):
+    -> clase 0  (p=1.00, n=2694)
