@@ -1,0 +1,3 @@
+# Modelos entrenados: contienen datos de rostros reales, no se suben
+*.xml
+__pycache__/
