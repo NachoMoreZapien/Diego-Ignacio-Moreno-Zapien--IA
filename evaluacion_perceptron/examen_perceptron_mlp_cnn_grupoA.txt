@@ -1,0 +1,139 @@
+# Perceptrón, MLP y CNN — Preguntas teóricas (grupo A)
+
+**Autor:** Diego Ignacio Moreno Zapien
+**Grupo:** A
+**Materia:** Inteligencia Artificial
+
+Actividad basada en el examen teórico de perceptrón, MLP y CNN del material de clase.
+
+---
+
+## Pregunta 1 — Idea del perceptrón
+
+**1. ¿Qué recibe, qué hace con los pesos y el bias, y qué produce?**
+Recibe un vector de entradas numéricas (x1, x2, …, xn). Multiplica cada entrada por su peso, que indica qué tanto importa esa entrada para la decisión. Suma todos esos productos y le agrega el bias, que funciona como un umbral ajustable: mueve el punto a partir del cual la neurona “se activa”. Esa suma pasa por una función de activación (en el perceptrón clásico, un escalón) y produce una salida binaria: 1 si la suma supera el umbral y 0 si no.
+Por ejemplo, con entradas (1, 0), pesos (0.6, 0.6) y bias −1: 0.6·1 + 0.6·0 − 1 = −0.4 → salida 0.
+
+**2. ¿Qué quiere decir que dos clases sean linealmente separables?**
+Que existe una línea recta (en 2D), un plano (en 3D) o un hiperplano (en más dimensiones) que deja todos los ejemplos de una clase de un lado y todos los de la otra clase del otro lado, sin ningún error. La compuerta AND es un ejemplo: una recta separa el punto (1,1) de los otros tres.
+
+**3. Una limitación fuerte del perceptrón de una sola capa.**
+Solo puede trazar una frontera recta. Si las clases no son linealmente separables, como en XOR, nunca podrá clasificar todos los ejemplos bien, sin importar cuántas épocas se entrene: con XOR la mejor recta posible acierta como máximo 3 de 4 casos.
+
+---
+
+## Pregunta 2 — Por qué aparece el MLP
+
+**1. ¿En qué sentido un MLP es “más de una capa de neuronas”?**
+Las neuronas se organizan en capas en cascada: una capa de entrada, una o más capas ocultas y una capa de salida. Cada neurona de una capa recibe las salidas de todas las neuronas de la capa anterior. Así, la salida final ya no es una sola suma ponderada, sino una composición de varias transformaciones encadenadas.
+
+**2. ¿Para qué sirve la capa oculta?**
+Para transformar las entradas en una representación intermedia: nuevas características que la red aprende sola combinando las entradas originales. En ese nuevo espacio, un problema que no era separable puede volverse separable. En XOR, por ejemplo, una neurona oculta puede aprender “al menos una entrada está encendida” y otra “las dos están encendidas”; la salida solo tiene que combinar esas dos ideas.
+
+**3. Si quitas todas las activaciones no lineales, ¿qué te queda y por qué importa?**
+Queda un modelo lineal. Componer funciones lineales da otra función lineal: W2(W1·x + b1) + b2 se puede reescribir como W·x + b. Importa porque entonces agregar capas no aumenta la capacidad de la red: toda la red equivale a un solo perceptrón, sigue sin poder resolver XOR y solo gasta más parámetros. La no linealidad es lo que permite fronteras curvas.
+
+---
+
+## Pregunta 3 — XOR como lección histórica
+
+**1. ¿Qué enseña el ejemplo XOR sobre el perceptrón simple?**
+Que una sola neurona lineal no puede representar ni siquiera una función lógica de dos entradas tan simple. En XOR, los puntos de clase 1, (0,1) y (1,0), están en una diagonal, y los de clase 0, (0,0) y (1,1), en la otra; ninguna recta los separa. Cuando Minsky y Papert lo señalaron (1969), el interés en las redes neuronales cayó durante años.
+
+**2. ¿Qué cambia al pasar a una red con capas ocultas y no linealidad?**
+Cada neurona oculta traza su propia recta y la activación no lineal permite combinar esas rectas, así que la frontera final puede ser curva o formada por varios trozos. Con solo dos neuronas ocultas ya se resuelve XOR. Además, con backpropagation se pueden entrenar todas las capas, lo que hizo prácticas este tipo de redes.
+
+**3. ¿Significa que el perceptrón nunca sirve en problemas reales?**
+No. Muchos problemas reales son lineales o casi lineales, y ahí un perceptrón o un modelo lineal es suficiente: entrena muy rápido, necesita pocos datos, se sobreajusta menos y es fácil de interpretar, porque cada peso dice cuánto influye cada variable. Por ejemplo, para un filtro de spam sencillo basado en conteo de palabras clave. También sirve como punto de comparación: si un MLP no supera claramente al modelo lineal, no vale la pena la complejidad extra.
+
+---
+
+## Pregunta 4 — Cómo “aprende” la red
+
+**1. El ciclo predicción → medir error → ajustar pesos.**
+La red recibe un ejemplo y, con los pesos que tiene en ese momento, calcula una predicción (propagación hacia adelante). Esa predicción se compara con la respuesta correcta usando una función de pérdida, que da un número que mide qué tan equivocada estuvo. Después, con backpropagation, se calcula cuánto contribuyó cada peso a ese error (el gradiente), y cada peso se mueve un poco en la dirección que hace bajar el error. Esto se repite con todos los ejemplos (una época) y durante muchas épocas, hasta que la pérdida deja de bajar.
+
+**2. ¿Qué controla el learning rate?**
+El tamaño del paso con que se ajustan los pesos en cada actualización. Si es muy pequeño, la red aprende lentísimo y puede quedarse lejos de una buena solución. Si es muy grande, cada ajuste se pasa del mínimo: la pérdida oscila o incluso crece y el entrenamiento diverge. Un valor adecuado hace que la pérdida baje de forma estable.
+
+**3. Subajuste y sobreajuste con un ejemplo escolar.**
+- **Subajuste:** un alumno que solo leyó el índice del libro. Le va mal en los ejercicios de práctica y también en el examen, porque no aprendió lo suficiente. En un modelo pasa cuando es demasiado simple para el problema (por ejemplo, una recta para separar puntos que forman un círculo): tiene error alto tanto en entrenamiento como en validación.
+- **Sobreajuste:** un alumno que memorizó las respuestas de la guía del año pasado sin entenderlas. Saca 10 en la guía, pero reprueba en cuanto cambian los números. En un modelo pasa cuando memoriza los datos de entrenamiento, incluido el ruido: precisión altísima en entrenamiento y baja en validación.
+
+---
+
+## Pregunta 5 — Salidas: sigmoide y softmax
+
+**1. ¿Cuándo usarías sigmoide y cuándo softmax?**
+Sigmoide para problemas binarios (una sola neurona que da la probabilidad de la clase positiva) o multietiqueta, donde varias clases pueden ser verdaderas a la vez y cada salida es independiente. Softmax para problemas multiclase con clases excluyentes, donde cada ejemplo pertenece a una sola clase; se pone una neurona por clase.
+
+**2. ¿Qué significa el vector que sale de un softmax?**
+Es una distribución de probabilidad sobre las clases: un valor entre 0 y 1 por clase, y entre todos suman 1. La clase predicha es la de mayor valor (argmax), y ese valor indica qué tan seguro está el modelo frente a las demás clases. Por ejemplo, [0.79, 0.17, 0.04] significa que el modelo se inclina claramente por la primera clase.
+
+**3. Ejemplo del curso y salida que encajaría.**
+- En el juego de esquivar balas, la decisión es saltar o no saltar: es binaria, así que encaja una sola neurona con sigmoide.
+- En el clasificador de riesgos con tres carpetas de imágenes (inundación, incendio, tornado), cada imagen es de una sola clase: encaja una capa Dense(3) con softmax y pérdida categorical crossentropy.
+
+---
+
+## Pregunta 6 — Motivación de la CNN
+
+**1. Inconveniente de aplastar una imagen y meterla a un MLP denso.**
+Al aplastarla se pierde la estructura espacial: píxeles que estaban juntos quedan lejos en el vector y la red ya no sabe cuáles eran vecinos. Además, cada píxel necesita su propio peso en cada neurona, así que el número de parámetros se dispara (una imagen 28×28×3 conectada a 64 neuronas ya son 150 528 pesos). Eso exige muchos más datos, favorece el sobreajuste y hace que, si el objeto se mueve unos píxeles, la red lo vea como algo completamente distinto.
+
+**2. ¿Qué aportan el filtro local y los pesos compartidos?**
+- **Filtro local:** cada neurona mira solo una ventana pequeña (por ejemplo 3×3), igual que los patrones visuales básicos (bordes, esquinas, texturas) son locales.
+- **Pesos compartidos:** el mismo filtro recorre toda la imagen. Así se usan muy pocos parámetros (un filtro 3×3 sobre RGB tiene 27 pesos más un bias, sin importar el tamaño de la imagen) y el patrón se detecta en cualquier posición donde aparezca.
+
+**3. Dos dominios donde una CNN tiene sentido.**
+- **Imágenes médicas:** radiografías o resonancias para detectar tumores o fracturas; son imágenes donde importan las formas locales.
+- **Audio convertido en espectrograma:** el sonido se representa como una imagen de tiempo contra frecuencia, y una CNN puede reconocer en ella patrones para clasificar sonidos o comandos de voz.
+
+---
+
+## Pregunta 7 — Piezas de una CNN
+
+1. **Convolución:** para extraer características locales. Cada filtro aprende un patrón y produce un mapa de características que indica en qué partes de la imagen aparece ese patrón.
+2. **Pooling:** para reducir el tamaño de los mapas conservando lo más importante (en max pooling, la respuesta más fuerte de cada zona). Baja el costo de cómputo y los parámetros de las capas siguientes, y da tolerancia a pequeños desplazamientos.
+3. **Flatten + Dense al final:** Flatten convierte el volumen de mapas en un vector; las capas densas combinan todas las características extraídas para tomar la decisión final, y la última, con softmax, da la probabilidad de cada clase.
+4. **Dropout durante el entrenamiento:** en cada paso apaga al azar un porcentaje de neuronas, para que la red no dependa de unas pocas y aprenda representaciones más robustas. Así se reduce el sobreajuste. Solo actúa en el entrenamiento; al predecir se usan todas las neuronas.
+
+---
+
+## Pregunta 8 — Capas bajas vs capas altas
+
+**1. ¿Qué captan las primeras capas frente a las más profundas?**
+Las primeras capas captan características simples y generales: bordes, líneas, cambios de color y texturas. Las capas más profundas combinan esas características para reconocer cosas más complejas y específicas de la tarea: formas, partes de objetos (ojos, ruedas, hojas) y finalmente objetos completos.
+
+**2. Analogía.**
+Es como aprender a leer: primero se reconocen trazos sueltos, luego esos trazos forman letras, las letras forman palabras y las palabras forman frases con significado. Cada nivel se construye con lo que reconoció el anterior, igual que cada capa de la CNN se construye sobre los mapas de la capa previa.
+
+**3. ¿Por qué “poner más capas” no garantiza un mejor modelo?**
+Porque cada capa agrega parámetros, y si no hay suficientes datos la red termina memorizando el entrenamiento (sobreajuste). Además, una red más profunda es más lenta y difícil de entrenar (los gradientes pueden desvanecerse), y si cada bloque trae pooling, los mapas se reducen tanto que se pierde información: una imagen de 32×32 después de cinco pooling de 2×2 queda en 1×1. Lo que decide si una arquitectura es mejor es su desempeño en validación, no su número de capas.
+
+---
+
+## Pregunta 9 — Elige arquitectura
+
+1. **Tabla de alumnos (promedio, faltas, horas de estudio) → ¿aprueba?** — **Perceptrón / modelo lineal**, porque son pocas variables numéricas en una tabla, sin estructura espacial, y la relación es probablemente casi lineal (más promedio y más horas, menos faltas → más probabilidad de aprobar).
+2. **Color de un semáforo en una fotografía.** — **CNN**, porque es una imagen y el semáforo puede aparecer en cualquier parte; los filtros locales con pesos compartidos detectan su forma y color sin importar la posición.
+3. **Clases en el plano que no se separan con una recta.** — **MLP**, porque sus capas ocultas con activación no lineal pueden formar fronteras curvas o a trozos, cosa que un perceptrón no puede.
+4. **¿CNN para autocompletar código o una secuencia larga de texto?** — **No.** Una CNN mira ventanas locales de tamaño fijo y no está pensada para modelar el orden ni las dependencias lejanas de una secuencia larga, como una variable declarada muchas líneas antes. Usaría una **RNN** (LSTM/GRU) o, mejor, un **Transformer**, cuyo mecanismo de atención relaciona cada token con todo el contexto anterior.
+
+---
+
+## Pregunta 10 — Mirada de proyecto
+
+**1. Train accuracy altísima y validation baja: ¿qué sospechas? Dos preguntas para la defensa.**
+Sospecho **sobreajuste**: el modelo memorizó los datos de entrenamiento en lugar de aprender patrones generales. También revisaría que los datos de validación vengan de la misma distribución que los de entrenamiento.
+Preguntas al equipo:
+- ¿Cómo dividieron los datos en entrenamiento y validación, y comprobaron que no haya ejemplos repetidos o casi iguales en ambos conjuntos?
+- ¿Cuántos ejemplos tienen por clase y qué hicieron para evitar el sobreajuste (dropout, data augmentation, early stopping, un modelo más pequeño)? ¿Pueden mostrar las curvas de pérdida de entrenamiento y validación por época?
+
+**2. ¿Por qué más neuronas o capas no sustituyen un buen planteamiento y buenos datos?**
+Porque la red solo aprende lo que está en los datos. Si las etiquetas están mal, faltan variables importantes, las clases están desbalanceadas o el problema se planteó mal (la salida o la métrica equivocada), un modelo más grande no lo corrige: solo aprende mejor esos errores y memoriza más ruido. Además, más capacidad exige todavía más datos para no sobreajustar. Un modelo sencillo con buenos datos y un problema bien definido suele superar a uno enorme con datos malos.
+
+**3. Tres preguntas orales para verificar que distinguen perceptrón, MLP y CNN.**
+1. Si tienes una tabla de 200 clientes con edad e ingreso, y al graficarla las dos clases se separan casi con una recta, ¿usarías un MLP de tres capas ocultas? ¿Por qué sí o por qué no?
+2. ¿Qué problemas concretos tendrías si, en vez de una CNN, entrenas un MLP aplanando fotos de 224×224? Menciona al menos dos.
+3. Dibuja cuatro puntos en el plano que un perceptrón no pueda separar. ¿Qué tendrías que agregarle a la red para separarlos y por qué funciona?
