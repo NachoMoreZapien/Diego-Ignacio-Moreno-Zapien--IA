@@ -1,0 +1,7 @@
+# Dataset y archivos que se generan al entrenar
+sportimages/
+prueba/
+*.keras
+*.h5
+clases.json
+graficas*.png
